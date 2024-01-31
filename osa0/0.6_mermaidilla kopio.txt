@@ -1,0 +1,27 @@
+Mermaid-syntaksilla 
+
+
+sequenceDiagram
+    participant browser
+    participant spa
+    participant server
+    participant database
+    
+    Note right of browser: User interacts with the SPA
+    
+    browser->>spa: User creates a new note
+    activate spa
+    spa-->>server: API request (POST /api/notes) with note content
+    activate server
+    server-->>database: Save new note to the database
+    activate database
+    database-->>server: Confirmation of note creation
+    deactivate database
+    server-->>spa: JSON response confirming note creation
+    deactivate server
+    spa-->>browser: Update UI with the new note
+    deactivate spa
+
+
+
+
