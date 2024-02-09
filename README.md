@@ -1,1 +1,1 @@
-# harjoitustyo
+# Fullstack open -kurssin harjoitustyo
