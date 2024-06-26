@@ -30,7 +30,7 @@ const PersonForm = ({ addName, newName, handleNameChange, newNumber, handleNumbe
 
 const Person = ({ person, handleDelete }) => (
   <li>{person.name} {person.number}
-    <button onClick={() => handleDelete(person.id)}> Delete </button>
+    <button onClick={() => handleDelete(person.id)}>Delete</button>
   </li>
 );
 
@@ -43,16 +43,14 @@ const Persons = ({ personsToShow, handleDelete }) => (
 );
 
 const App = () => {
-  
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
 
   useEffect(() => {
-    console.log('effect');
     personService
       .getAll()
       .then(response => {
@@ -66,6 +64,27 @@ const App = () => {
   const addName = (event) => {
     event.preventDefault();
 
+    // error viesti jos nimi on alle 3 kirjainta pitkä
+    if (newName.length < 3) {
+      setNotificationMessage(`Name must be at least 3 characters long.`);
+      setMessageType('error');
+      setTimeout(() => {
+        setNotificationMessage(null);
+        setMessageType(null);
+      }, 5000);
+      return;
+    }
+    // error viesti jos numero on liian lyhyt ja jos se ei koostu kahdesta oikein koostetusta osasta
+    if (!/^\d{2,3}-\d+$/.test(newNumber) || newNumber.length < 8) {
+      setNotificationMessage(`Number must be at least 8 characters long and in the format XX-XXXXXXX or XXX-XXXXXXX.`);
+      setMessageType('error');
+      setTimeout(() => {
+        setNotificationMessage(null);
+        setMessageType(null);
+      }, 5000);
+      return;
+    }
+
     const existingPerson = persons.find(person => person.name === newName);
     if (existingPerson) {
       if (window.confirm(`${newName} is already added to phonebook. Replace the old number with a new one?`)) {
@@ -76,15 +95,24 @@ const App = () => {
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : response));
             setNewName('');
             setNewNumber('');
-            setErrorMessage(`${existingPerson.name} was updated successfully.`);
+            setNotificationMessage(`${existingPerson.name} was updated successfully.`);
             setMessageType('success');
             setTimeout(() => {
-              setErrorMessage(null);
+              setNotificationMessage(null);
               setMessageType(null);
             }, 5000);
           })
           .catch(error => {
             console.log('Error updating person:', error);
+            setNotificationMessage(
+              `Person '${existingPerson.name}' was already removed from server`
+            );
+            setMessageType('error');
+            setTimeout(() => {
+              setNotificationMessage(null);
+              setMessageType(null);
+            }, 5000);
+            setPersons(persons.filter(person => person.id !== existingPerson.id));
           });
       }
       return;
@@ -96,15 +124,21 @@ const App = () => {
         setPersons(persons.concat(response));
         setNewName('');
         setNewNumber('');
-        setErrorMessage(`${response.name} was added successfully.`);
+        setNotificationMessage(`${response.name} was added successfully.`);
         setMessageType('success');
         setTimeout(() => {
-          setErrorMessage(null);
+          setNotificationMessage(null);
           setMessageType(null);
         }, 5000);
       })
       .catch(error => {
         console.log('Error adding person:', error);
+        setNotificationMessage(error.response.data.error);
+        setMessageType('error');
+        setTimeout(() => {
+          setNotificationMessage(null);
+          setMessageType(null);
+        }, 5000);
       });
   };
 
@@ -127,15 +161,21 @@ const App = () => {
         .remove(id)
         .then(() => {
           setPersons(persons.filter(person => person.id !== id));
-          setErrorMessage(`${personToDelete.name} was deleted successfully.`);
-          setMessageType('error');
+          setNotificationMessage(`${personToDelete.name} was deleted successfully.`);
+          setMessageType('success');
           setTimeout(() => {
-            setErrorMessage(null);
+            setNotificationMessage(null);
             setMessageType(null);
           }, 5000);
         })
         .catch(error => {
           console.log('Error deleting person:', error);
+          setNotificationMessage('Failed to delete person.');
+          setMessageType('error');
+          setTimeout(() => {
+            setNotificationMessage(null);
+            setMessageType(null);
+          }, 5000);
         });
     }
   };
@@ -147,7 +187,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Notification message={errorMessage} messageType={messageType} />
+      <Notification message={notificationMessage} messageType={messageType} />
       <FilterForm filter={filter} handleFilterChange={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
