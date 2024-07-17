@@ -1,0 +1,22 @@
+# Add a new user
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "mamak",
+  "name": "Matias Mäkinen",
+  "password": "salainen"
+}
+
+###
+
+# Attempt to add a user with an existing username
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "root",
+  "name": "Superuser",
+  "password": "salainen"
+}
+

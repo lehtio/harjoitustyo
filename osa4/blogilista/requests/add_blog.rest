@@ -1,0 +1,25 @@
+# Kirjautuminen ja tokenin hakeminen
+// parempi versio login.rest
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+  "username": "mluukkai",
+  "password": "salainen"
+}
+
+### 
+
+# Blogipostauksen lisääminen
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI2Njg4NThlY2EwNzlhMzhiMzVmODkxNGIiLCJpYXQiOjE3MjExMTE0NTR9.L727EmV-qUOLuyp-0FBFuQWSuR8mKvglPjqc9GhWIPc
+
+{
+  "title": "Blogipostaus testi",
+  "author": "Test Author",
+  "url": "http://example.com",
+  "likes": 5
+}
+
+###
