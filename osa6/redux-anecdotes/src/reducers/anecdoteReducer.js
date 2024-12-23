@@ -1,4 +1,8 @@
 const anecdotesAtStart = [
+  'Kissa istuu',
+  'Koira haukkuu',
+  'Kettu kiertää',
+  'Karhu nukkuu',
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
   'The first 90 percent of the code accounts for the first 90 percent of the development time...',
